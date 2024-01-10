@@ -1,0 +1,121 @@
+﻿@using FinalCoffee1.common.helperServices;
+@using FinalCoffee1.Modules.Admin.service;
+@inject SessService sessionService;
+@inject AdminServiceModel adminService;
+@using FinalCoffee1.common.helperClass;
+@using System.Diagnostics
+@implements IDisposable
+
+<div class="top-row ps-3 navbar navbar-dark d-flex align-items-center">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">☕️Bislerium☕️</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                <span style="color: white;">🏠</span> &nbsp;&nbsp;Home
+            </NavLink>
+        </div>
+
+        @* If user is not logged in *@
+        @if (!sessionService.IsUserLoggedIn())
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/login">
+                    <span style="color: white;">🌐</span> &nbsp;&nbspLogin
+                </NavLink>
+            </div>
+        }
+
+        @* if user is never been registered to the application *@
+        @if (!sessionService.isAdminRegistered())
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/register">
+                    <span style="color: white;">🔑</span> &nbsp;&nbsp;Register
+                </NavLink>
+            </div>
+        }
+
+        @* if user is logged in *@
+        @if (sessionService.IsUserLoggedIn() && sessionService.CurrentUserType == UserType.admin)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/staff/add">
+                    <span style="color: white;">👨🏻‍💻</span> &nbsp;&nbsp;Staff
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/coffee/menue">
+                    <span style="color: white;">☕</span> &nbsp;&nbsp;Coffee
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/coffee/addins">
+                    <span style="color: white;">🌟</span> &nbsp;&nbsp;Add-ins
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/report">
+                    <span style="color: white;">📊</span> &nbsp;&nbsp;Business Report
+                </NavLink>
+            </div>
+        }
+
+        @if (sessionService.IsUserLoggedIn() && sessionService.CurrentUserType == UserType.staff)
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/staff/orderCoffee">
+                    <span style="color: white;">📄</span> &nbsp;&nbsp;Take Order
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/staff/addMember">
+                    <span style="color: white;">𖨆𖨆𖨆𖨆</span> &nbsp;&nbsp;Register Customer
+                </NavLink>
+            </div>
+        }
+
+        @if (sessionService.IsUserLoggedIn())
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/totalTransactions">
+                    <span style="color: white;"> 💳 </span> &nbsp;&nbsp;Total Transactions
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/changePassword">
+                    <span style="color: #d6d5d5">🔐</span> &nbsp;&nbsp;Change Password
+                </NavLink>
+            </div>
+
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="/admin/logout">
+                    <span style="color: #d6d5d5">🚪</span> &nbsp;&nbsp;Logout
+                </NavLink>
+            </div>
+        }
+    </nav>
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        sessionService.OnChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        sessionService.OnChange -= StateHasChanged;
+    }
+}

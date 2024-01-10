@@ -1,0 +1,222 @@
+@page "/coffee/menue"
+@namespace FinalCoffee1.Pages.coffee
+@using FinalCoffee1.Modules.Coffee.model;
+@using FinalCoffee1.Modules.Admin.model;
+@using FinalCoffee1.Modules.Admin.service;
+@using FinalCoffee1.common.helperServices;
+@using FinalCoffee1.Modules.Coffee.service;
+@using FinalCoffee1.Pages.coffee;
+@using FinalCoffee1.Pages.admin;
+@using System.Diagnostics
+@inject AdminServiceModel adminService;
+@inject NotificationService notificationService;
+@inject SessService sessionService;
+@inject CoffeeService coffeeService;
+@inject ActService actionService;
+<h3>Menu</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>CoffeeType</th>
+            <th>Size</th>
+            <th>Price</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (coffeesList != null && coffeesList.Count > 0)
+        {
+            @foreach (var coffee in coffeesList)
+            {
+                <tr>
+                    <td class="text">@coffee.Name</td>
+                    <td class="text">@coffee.CoffeeType</td>
+                    <td class="text">@coffee.Size</td>
+                    <td class="text">@coffee.Price</td>
+                    <td>
+                        <button @onclick="() => OpenEditModel(coffee)" class="edit-button">Edit</button>
+                        <button @onclick="()=>deleteCoffee(coffee)" class="delete-button">Delete</button>
+                        @if (showEditModel)
+                        {
+                            <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Add Coffee</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <CoffeeInput ButtonLabel="Edit Coffee" Model="coffeeModel" OnSubmit="editCoffee"
+                                                message=""
+                                                messageClass=""></CoffeeInput>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+@if (!isAuthorization)
+{
+    <button type="button" class="btn btn-primary" @onclick="OpenAddModal">Add Coffee</button>
+    @if (showAddModal)
+    {
+        <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Coffee</h5>
+                    </div>
+                    <div class="modal-body">
+                        <CoffeeInput ButtonLabel="Add Coffee" Model="coffeeModel" OnSubmit="addCoffee"
+                            message="" messageClass=""></CoffeeInput>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+@if (isAuthorization && (sessionService.defaultNeedAuthorized()))
+{
+    <div class="modal" tabindex="-1" role="dialog" style="display:block;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Admin Login</h5>
+                </div>
+                <div class="modal-body">
+                    <AdminForm ButtonLabel="Log in" Model="Model" OnSubmit="Login" message="@message"
+                        messageClass="@messageClass"></AdminForm>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CloseModal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@code {
+    private string? message = "";
+    @* private CoffeeModel editCoffeeModel; *@
+    private string? messageClass = "";
+    AdminModel Model = new AdminModel();
+    bool isAuthorization = false;
+    bool showAddModal = false;
+    bool showEditModel = false;
+    CommonModel coffeeModel = new CommonModel();
+    List<CommonModel>? coffeesList = new List<CommonModel>();
+    protected async override void OnInitialized()
+    {
+        notificationService.Clear();
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        sessionService.setOnlyCoffee(true);
+        coffeesList = await coffeeService.getList("coffee.json");
+    }
+    public async Task<bool> NeedAuthentication()
+    {
+        if (sessionService.defaultNeedAuthorized())
+        {
+            isAuthorization = true;
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    public async void deleteCoffee(CommonModel coffee)
+    {
+        var needAuth = await this.NeedAuthentication();
+        if (!needAuth)
+        {
+            Trace.WriteLine("This is CoffeeID: " + coffee.Id);
+            var result = await actionService.Delete<CoffeeModel>(coffee.Id, "coffee.json");
+            if (result.Success)
+            {
+                coffeesList.Remove(coffee);
+                StateHasChanged();
+            }
+            else
+            {
+                notificationService.Notify(result.Message, "success-message");
+            }
+        }
+
+    }
+    public async void addCoffee()
+    {
+        Trace.WriteLine("Now You Can Add Coffee");
+        var result = await coffeeService.addCoffee(coffeeModel, "coffee.json");
+        notificationService.Notify(result.Message, "success-message");
+        notificationService.Clear();
+        Trace.WriteLine("This is Result: " + notificationService.Message);
+        coffeesList = await coffeeService.getList("coffee.json");
+        sessionService.setNeedAuthorized(false);
+        CloseModal();
+        StateHasChanged(); //Because UI is not able to fetch coffee so we need to make it sure it will fetch the added coffees.
+
+    }
+    public async void editCoffee()
+    {
+        var result = await coffeeService.Edit(coffeeModel.Id, coffeeModel, "coffee.json");
+        notificationService.Notify(result.Message, "success-message");
+        coffeesList = await coffeeService.getList("coffee.json");
+        CloseModal();
+        StateHasChanged();
+    }
+    //This is comment
+    public async Task Login()
+    {
+        var result = await actionService.Login<AdminModel>(Model);
+        if (result.Success)
+        {
+            sessionService.setNeedAuthorized(false);
+            message = result.Message;
+            messageClass = "success-message";
+            CloseModal();
+        }
+        else
+        {
+            message = result.Message;
+            messageClass = "error-message";
+        }
+    }
+    public async void OpenAddModal()
+    {
+        var result = await this.NeedAuthentication();
+        if (!result)
+        {
+            showAddModal = true;
+        }
+
+    }
+    public async void OpenEditModel(CommonModel coffee)
+    {
+        var result = await this.NeedAuthentication();
+        if (!result)
+        {
+            coffeeModel = coffee;
+            showEditModel = true;
+        }
+
+    }
+
+    public void CloseModal()
+    {
+        showAddModal = false;
+        showEditModel = false;
+        isAuthorization = false;
+    }
+}

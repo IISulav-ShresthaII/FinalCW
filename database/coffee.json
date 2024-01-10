@@ -1,0 +1,1 @@
+[{"Name":"Coffee","CoffeeType":"Milk","Size":"S","Price":100,"index":0,"AddIns":[],"Id":1},{"Name":"Tea","CoffeeType":"Milk","Size":"S","Price":30,"index":0,"AddIns":[],"Id":2},{"Name":"Coffee","CoffeeType":"Black","Size":"Medium","Price":100,"index":0,"AddIns":[],"Id":3},{"Name":"Americano","CoffeeType":"Double Shot","Size":"M","Price":170,"index":0,"AddIns":[],"Id":4}]

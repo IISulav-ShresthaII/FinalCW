@@ -1,0 +1,44 @@
+@namespace FinalCoffee1.Pages.admin
+@using FinalCoffee1.common.helperServices;
+@using FinalCoffee1.Modules.Admin.service;
+@using FinalCoffee1.Modules.Staff.service;
+@using System.Diagnostics
+@inject SessService sessionService;
+@inject NavigationManager NavigationManager;
+@inject NotificationService notificationService;
+@inject AdminServiceModel adminService;
+@inject StaffService staffService;
+@inject ActService actionService;
+@page "/admin/logout"
+
+<button style="background-color: #3E2723 color: white; padding: 10px 15px; cursor: pointer; border: none; transition: color 0.3s; margin-top: 30px;"
+        @onclick="HandleSubmit">Logout</button>
+
+
+
+@code {
+    private string? message = "";
+    private string? messageClass = "";
+    private async Task HandleSubmit()
+    {
+        var result = await actionService.logOut();
+        if (result.Success)
+        {
+            sessionService.SetCurrentUser(false);
+            sessionService.setNeedAuthorized(true);
+            sessionService.setOnlyCoffee(false);
+            sessionService.setCustomerOnly(false);
+            sessionService.SetCurrentUserType(UserType.admin);
+            await staffService.clearOrderList();
+        message = result.Message;
+            messageClass = "success-message";
+            notificationService.Notify(message, messageClass);
+            NavigationManager.NavigateTo("/admin/login");
+        }
+        else
+        {
+            message = result.Message;
+            messageClass = "error-message";
+        }
+    }
+}

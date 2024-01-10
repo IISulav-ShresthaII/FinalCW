@@ -1,0 +1,98 @@
+﻿<style >
+h3 {
+    color: saddlebrown;
+    font-family: 'Verdana';
+    font-size: 35px;
+}
+
+button {
+    background-color: saddlebrown;
+    color: whitesmoke;
+    padding: 10px 15px;
+    cursor: pointer;
+    border: none;
+    transition: background-image 0.3s;
+    margin-right: 5px;
+}
+
+    button:hover {
+        background-image: linear-gradient(180deg, #3e2723 0%, #3e2723 100%);
+    }
+
+.edit-button, .delete-button {
+    background-color: #6d4c41;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    margin-right: 5px;
+    transition: background-image 0.3s;
+}
+
+    .edit-button:hover, .delete-button:hover {
+        background-image: linear-gradient(180deg, #3e2723 0%, #3e2723 100%);
+    }
+
+.text {
+    color: saddlebrown;
+    font-family: 'Verdana';
+    font-size: 20px;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+    th, .table td {
+        border: 1px solid #8d6e63;
+        padding: 8px;
+        text-align: left;
+    }
+
+th {
+    background-color: #5d4037;
+    color: #fff;
+}
+
+.table tr:nth-child(even) {
+    background-color: #d7ccc8;
+}
+
+.modal {
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-content {
+    background-color: #d7ccc8;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.modal-header {
+    background-color: #5d4037;
+    color: white;
+}
+
+.modal-footer {
+    background-color: #d7ccc8;
+}
+
+</style >
+<!-- Your existing HTML content -->
+<h3 > Menu</h3 >
+<table class="table" >
+<!-- Table headers and body content -->
+</table >
+<!-- Modals and other elements -->

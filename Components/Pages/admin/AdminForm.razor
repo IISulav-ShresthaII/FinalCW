@@ -1,0 +1,61 @@
+﻿@namespace FinalCoffee1.Pages.admin
+@using FinalCoffee1.Modules.Admin.model
+@using FinalCoffee1.common.helperServices
+@using FinalCoffee1.Common.model
+@inject SessService sessionService
+
+<EditForm Model="Model" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <p class="@messageClass">@message</p>
+        <label for="username" class="color">Username:</label>
+        <input class="label-input-container" required id="username" @bind="Model.Username" />
+        <ValidationMessage For="@(() => Model.Username)" />
+    </div>
+    @if (!sessionService.getCustomerOnly())
+    {
+        <div class="form-group">
+            <label for="password" class="color">Password:</label>
+            <input class="label-input-container" required id="password" type="password" @bind="Model.Password" />
+            <ValidationMessage For="@(() => Model.Password)" />
+        </div>
+        <div class="form-group select-container">
+            <label class="color" for="userType">Role:</label>
+            <div class="label-input-container">
+                <select @bind="Model.userType">
+                    <option value="">Choose type</option>
+                    <option value="admin">Admin</option>
+                    <option value="staff">Staff</option>
+                </select>
+            </div>
+            <ValidationMessage For="@(() => Model.userType)" />
+        </div>
+
+    }
+    @if (sessionService.getCustomerOnly())
+    {
+        <div class="form-group">
+            <label for="Email" class="color">Email:</label>
+            <input class="label-input-container" required id="Email" type="text" @bind="Model.Email" />
+            <ValidationMessage For="@(() => Model.Email)" />
+        </div>
+    }
+    <button type="submit" class="button">@(ButtonLabel ?? "Submit")</button>
+</EditForm>
+
+@code {
+    [Parameter]
+    public string? ButtonLabel { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [Parameter]
+    public UserModel Model { get; set; } = new UserModel { userType = UserType.admin, Password = null };
+
+    [Parameter]
+    public string? message { get; set; }
+
+    [Parameter]
+    public string? messageClass { get; set; }
+}

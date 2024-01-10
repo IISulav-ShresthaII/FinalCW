@@ -1,0 +1,56 @@
+@using FinalCoffee1.Modules.Coffee.model
+@using FinalCoffee1.common.helperServices;
+@inject SessService sessionService;
+@namespace FinalCoffee1.Pages.coffee
+<EditForm Model="@Model" OnValidSubmit="OnSubmit">
+    <DataAnnotationsValidator />
+    <div class="form-group">
+        <p class="@messageClass">@message</p>
+        <label for="coffeeName" class="col-sm-2 col-form-label whitespace-nowrap">Name:</label>
+        <div class="col-sm-12">
+            <input type="text" id="coffeeName" class="form-control" required @bind="Model.Name" />
+             <ValidationMessage For="@(() => Model.Name)" />
+        </div>
+    </div>
+    @if (sessionService.getOnlyCoffee())
+    {
+        <div class="form-group">
+            <label for="coffeeType" class="col-sm-2 col-form-label">Type:</label>
+            <div class="col-sm-12">
+                <input type="text" id="coffeeType" class="form-control" required @bind="Model.CoffeeType" />
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="coffeeSize" class="col-sm-2 col-form-label">Size:</label>
+            <div class="col-sm-12">
+                <input type="text" id="coffeeSize" class="form-control" required @bind="Model.Size" />
+            </div>
+        </div>
+    }
+    <div class="form-group">
+        <label for="coffeePrice" class="col-sm-2 col-form-label">Price:</label>
+        <div class="col-sm-12">
+            <input type="number" id="coffeePrice" class="form-control" required @bind="Model.Price" />
+            <ValidationMessage For="@(() => Model.Price)" />
+
+        </div>
+    </div>
+    <button type="submit">@ButtonLabel</button>
+</EditForm>
+@code {
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+    [Parameter]
+    public CommonModel? Model { get; set; }
+    [Parameter]
+    public string? ButtonLabel { get; set; }
+    [Parameter]
+    public string? FormType { get; set; }
+    [Parameter]
+    public string? message { get; set; }
+
+    [Parameter]
+    public string? messageClass { get; set; }
+
+
+}

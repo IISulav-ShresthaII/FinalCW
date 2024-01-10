@@ -1,0 +1,42 @@
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 15px;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    margin: 15px 0;
+}
+th {
+    background-color: #f2f2f2;
+    color: black;
+}
+tr {
+    background-color: #f8f8f8;
+    border-radius: 10px; 
+}
+.edit-button {
+    background-color: green;
+    color: white;
+    border: none;
+}
+
+.delete-button {
+    margin-top: 5px;
+    background-color: red;
+    color: white;
+    border: none;
+}
+
+.fail-message {
+    color: red;
+    font-weight: bold;
+    text-align: center;
+}
+
+.success-message{
+    color: green;
+    font-weight: bold;
+    text-align: center;
+}

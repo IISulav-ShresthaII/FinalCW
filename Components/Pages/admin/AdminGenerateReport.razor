@@ -1,0 +1,46 @@
+@page "/admin/report"
+@namespace FinalCoffee1.Pages.admin
+@using FinalCoffee1.Modules.Admin.service;
+@using System.Diagnostics;
+@inject AdminServiceModel adminService;
+<h3 class="text"> Business Reports</h3>
+<h3 class="@messageClass"> @message </h3>
+<EditForm Model="this" OnValidSubmit="GenerateReport">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputDate @bind-Value="selectedDate" />
+    <select @bind="reportType">
+        <option value="daily">Daily</option>
+        <option value="monthly">Monthly</option>
+    </select>
+    <br>
+    <button type="submit">Generate Report</button>
+</EditForm>
+
+
+@code {
+    private DateTime selectedDate = DateTime.Now;
+    private string reportType = "daily";
+
+    public string message = "";
+    public string messageClass = "";
+
+    private async Task GenerateReport()
+    {
+        Trace.WriteLine("Generate Report");
+        var result = await adminService.GenerateReport(selectedDate, reportType);
+        if (result.Success)
+        {
+            message = result.Message;
+            messageClass = "success-message";
+            StateHasChanged();
+        }
+        else
+        {
+            message = result.Message;
+            messageClass = "fail-message";
+            StateHasChanged();
+        }
+    }
+}

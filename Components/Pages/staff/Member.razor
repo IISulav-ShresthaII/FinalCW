@@ -1,0 +1,67 @@
+@page "/staff/addMember"
+@namespace FinalCoffee1.Pages.staff
+@using FinalCoffee1.Pages.admin;
+@using FinalCoffee1.Modules.Admin.model
+@using FinalCoffee1.Modules.Admin.service;
+@using FinalCoffee1.Common.model;
+@using FinalCoffee1.common.helperServices;
+@inject NavigationManager navigationManager
+@inject AdminServiceModel adminService;
+@inject NotificationService notificationService;
+@inject SessService sessionService;
+@using Microsoft.Extensions.Logging
+@using System.Diagnostics
+@inject SessService sessionService;
+@inject ActService actionService;
+<h3>Register Member</h3>
+
+<AdminForm ButtonLabel="Add Customer" Model="Model" OnSubmit="HandleSubmit" message="@message"
+    messageClass="@messageClass" />
+
+@code {
+    private string? message = "";
+    private string? messageClass = "";
+    UserModel Model = new UserModel();
+    protected override void OnInitialized()
+    {
+        message = notificationService.Message;
+        messageClass = notificationService.MessageClass;
+        notificationService.Clear();
+    }
+    protected async override Task OnParametersSetAsync()
+    {
+        sessionService.setCustomerOnly(true);
+    }
+
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            var result = await actionService.Register<UserModel>(Model);
+            if (result.Success)
+            {
+                sessionService.setAdminRegistered();
+                message = result.Message;
+                messageClass = "success-message";
+                notificationService.Notify(message, messageClass);
+                navigationManager.NavigateTo("/admin/addMember");
+            }
+            else
+            {
+                message = result.Message;
+                messageClass = "error-message";
+                notificationService.Notify(message, messageClass);
+                navigationManager.NavigateTo("/admin/addMember");
+
+            }
+        }
+        catch (Exception error)
+        {
+            message = error.Message;
+        }
+
+    }
+
+
+}

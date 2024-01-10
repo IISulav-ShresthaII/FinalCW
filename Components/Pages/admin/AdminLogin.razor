@@ -1,0 +1,64 @@
+@page "/admin/login"
+@namespace FinalCoffee1.Pages.admin
+@using FinalCoffee1.Modules.Admin.model
+@using FinalCoffee1.Modules.Admin.service;
+@using FinalCoffee1.Common.model;
+@using FinalCoffee1.common.helperServices;
+@inject NavigationManager navigationManager
+@inject AdminServiceModel adminService;
+@inject NotificationService notificationService;
+@inject SessService sessionService;
+@using Microsoft.Extensions.Logging
+@using System.Diagnostics
+@inject SessService sessionService;
+@inject ActService actionService;
+<h3>Login</h3>
+<AdminForm ButtonLabel="Login" Model="Model" OnSubmit="HandleSubmit" message="@message" messageClass="@messageClass" />
+@code {
+    private string? message = "";
+    private string? messageClass = "";
+    AdminModel Model = new AdminModel();
+
+    protected override void  OnInitialized()
+    {
+        message = notificationService.Message;
+        messageClass = notificationService.MessageClass;
+        notificationService.Clear();
+    }
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            Trace.WriteLine("This is Login");
+            var result = await actionService.Login<AdminModel>(Model);
+            if (result.Success)
+            {
+                if (Model.userType == UserType.admin)
+                {
+                    sessionService.SetCurrentUserType(UserType.admin);
+                }
+                else if (Model.userType == UserType.staff)
+                {
+                    sessionService.SetCurrentUserType(UserType.staff);
+                }
+                Trace.WriteLine(result);
+                sessionService.SetCurrentUser(true);
+                sessionService.NotifyStateChanged();
+                message = result.Message;
+                messageClass = "success-message";
+                navigationManager.NavigateTo("/");
+            }
+            else
+            {
+                message = result.Message;
+                messageClass = "error-message";
+            }
+        }
+        catch (Exception error)
+        {
+            message = error.Message;
+        }
+
+    }
+
+}

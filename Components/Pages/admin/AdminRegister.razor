@@ -1,0 +1,55 @@
+@page "/admin/register"
+@namespace FinalCoffee1.Pages.admin
+@using FinalCoffee1.Modules.Admin.model
+@using FinalCoffee1.Modules.Admin.service
+@using FinalCoffee1.Pages.admin
+@using FinalCoffee1.common.helperServices
+@using System.Diagnostics
+@inject AdminServiceModel adminService;
+@inject NavigationManager navigationManager;
+@inject NotificationService notificationService;
+@inject SessService sessionService;
+@inject ActService actionService;
+
+<h3>Admin Register</h3>
+
+
+<AdminForm ButtonLabel="Register" Model="Model" OnSubmit="HandleSubmit" message="@message"
+    messageClass="@messageClass" />
+
+@code {
+    private string message = "";
+    private string messageClass = "";
+    AdminModel Model = new AdminModel();
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            var result = await actionService.Register<AdminModel>(Model);
+            if (result.Success)
+            {
+                sessionService.setAdminRegistered();
+                message = result.Message;
+                messageClass = "success-message";
+                notificationService.Notify(message, messageClass);
+                navigationManager.NavigateTo("/admin/login");
+
+            }
+            else
+            {
+                message = result.Message;
+                messageClass = "error-message";
+                notificationService.Notify(message, messageClass);
+                navigationManager.NavigateTo("/admin/login");
+
+            }
+        }
+        catch (Exception error)
+        {
+            message = error.Message;
+        }
+
+    }
+
+}
